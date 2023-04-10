@@ -21,6 +21,7 @@ import org.inventivetalent.update.spiget.SpigetUpdate;
 import org.inventivetalent.update.spiget.UpdateCallback;
 import org.inventivetalent.update.spiget.comparator.VersionComparator;
 
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +35,7 @@ import static org.inventivetalent.mapmanager.manager.MapManager.Options.*;
  * use <code>Bukkit.getPluginManager().getPlugin("MapManager")</code> to access the plugin instance or <code>Bukkit.getPluginManager().getPlugin("MapManager").getMapManager()</code> to access the {@link MapManager} instance
  */
 public class MapManagerPlugin extends JavaPlugin {
-
+    private static boolean listMethods = true;
     protected static MapManagerPlugin instance;
 
     protected MapManager mapManagerInstance;
@@ -174,8 +175,43 @@ public class MapManagerPlugin extends JavaPlugin {
             Object nmsWorld = CraftWorldFieldResolver.resolveAccessor("world").get(world);
 
             Object entity;
-            if (MinecraftVersion.VERSION.newerThan(Minecraft.Version.v1_17_R1)) {
+            if (MinecraftVersion.VERSION.newerThan(Minecraft.Version.v1_18_R1)) {
+                entity = WorldServerMethodResolver.resolve(new ResolverQuery(
+                        "a",
+                        int.class
+                )).invoke(nmsWorld, entityId);
+            } else if (MinecraftVersion.VERSION.newerThan(Minecraft.Version.v1_17_R1)) {
                 // no more entitiesById in 1.17
+                if (MapManagerPlugin.listMethods) {
+                    try {
+                        for (int i = 0; true; i++) {
+                            Method method = WorldServerMethodResolver.resolveIndex(i);
+                            if (method == null) {
+                                break;
+                            }
+                            StringBuilder stringBuilder = new StringBuilder(
+                                method.getReturnType().getName() + "=" +
+                                method.getName() + "("
+                            );
+                            for (Class<?> paramType : method.getParameterTypes()) {
+                                stringBuilder.append(
+                                    paramType.getName()
+                                ).append(", ");
+                            }
+                            stringBuilder.append(")");
+                            System.err.println(
+                                "WorldServer.method: " + i + " - " +
+                                stringBuilder.toString().replace(
+                                    ",)",
+                                    ")"
+                                )
+                            );
+                        }
+                    } catch (IndexOutOfBoundsException | ReflectiveOperationException e) {
+                    }
+
+                    MapManagerPlugin.listMethods = false;
+                }
                 entity = WorldServerMethodResolver.resolve(new ResolverQuery("getEntity", int.class)).invoke(nmsWorld, entityId);
             } else {
                 Object entitiesById;

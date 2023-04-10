@@ -7,6 +7,7 @@ import org.inventivetalent.reflection.minecraft.Minecraft;
 import org.inventivetalent.reflection.minecraft.MinecraftVersion;
 import org.inventivetalent.reflection.resolver.FieldResolver;
 import org.inventivetalent.reflection.resolver.MethodResolver;
+import org.inventivetalent.reflection.resolver.ResolverQuery;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -232,7 +233,18 @@ class MapSender {
         try {
             Object handle = Minecraft.getHandle(p);
             final Object connection = EntityPlayerFieldResolver.resolveByFirstTypeAccessor(PlayerConnection).get(handle);
-            PlayerConnectionMethodResolver.resolve("sendPacket").invoke(connection, packet);
+            if (MinecraftVersion.VERSION.newerThan(Minecraft.Version.v1_18_R1)) {
+                PlayerConnectionMethodResolver.resolve(new ResolverQuery(
+                    "a",
+                    MapManagerPlugin.nmsClassResolver.resolve(
+                        "network.protocol.Packet"
+                    )
+                )).invoke(connection, packet);
+            } else {
+                PlayerConnectionMethodResolver.resolve(
+                    "sendPacket"
+                ).invoke(connection, packet);
+            }
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
