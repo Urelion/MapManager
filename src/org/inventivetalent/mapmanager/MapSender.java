@@ -10,6 +10,7 @@ import org.inventivetalent.reflection.resolver.MethodResolver;
 import org.inventivetalent.reflection.resolver.ResolverQuery;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -233,6 +234,8 @@ class MapSender {
         try {
             Object handle = Minecraft.getHandle(p);
             final Object connection = EntityPlayerFieldResolver.resolveByFirstTypeAccessor(PlayerConnection).get(handle);
+            Method sendPacket = PlayerConnectionMethodResolver.resolveSignature("void sendPacket(Packet)", "void a(Packet)");
+            sendPacket.invoke(connection, packet);
             if (MinecraftVersion.VERSION.newerThan(Minecraft.Version.v1_18_R1)) {
                 PlayerConnectionMethodResolver.resolve(new ResolverQuery(
                     "a",
