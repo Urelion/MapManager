@@ -454,14 +454,13 @@ class DefaultMapWrapper implements MapWrapper {
                 Constructor<?> noArgConstructor = PacketPlayOutEntityMetadata.getConstructor();
                 meta = noArgConstructor.newInstance();
             } catch (ReflectiveOperationException e) {
-                Object dummyDataWatcher = DataWatcher.getConstructor(Entity).newInstance((Object) null);
-
                 if (MinecraftVersion.VERSION.newerThan(Minecraft.Version.v1_19_R2)) {
                     meta = PacketPlayOutEntityMetadata.getConstructor(
                         int.class,
                         List.class
                     ).newInstance(entityId, list);
                 } else {
+                    Object dummyDataWatcher = DataWatcher.getConstructor(Entity).newInstance((Object) null);
                     meta = PacketPlayOutEntityMetadata.getConstructor(
                         int.class,
                         DataWatcher,
