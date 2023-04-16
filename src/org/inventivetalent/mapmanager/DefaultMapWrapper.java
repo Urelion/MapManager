@@ -20,7 +20,6 @@ import org.inventivetalent.reflection.resolver.ConstructorResolver;
 import org.inventivetalent.reflection.resolver.FieldResolver;
 import org.inventivetalent.reflection.resolver.MethodResolver;
 import org.inventivetalent.reflection.resolver.ResolverQuery;
-import org.yaml.snakeyaml.events.Event.ID;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -51,6 +50,9 @@ class DefaultMapWrapper implements MapWrapper {
     private static ConstructorResolver DataWatcherItemConstructorResolver;
     private static ConstructorResolver DataWatcherObjectConstructorResolver;
     private static FieldResolver EntityItemFrameFieldResolver;
+
+    // 1.19
+    private static MethodResolver DataWatcherItemMethodResolver;
 
     static Material MAP_MATERIAL;
 
@@ -447,7 +449,25 @@ class DefaultMapWrapper implements MapWrapper {
                     dataWatcherItem = constructor.newInstance(dataWatcherObject, com.google.common.base.Optional.fromNullable(craftItemStack));
                 }
 
-                list.add(dataWatcherItem);
+                if (MinecraftVersion.VERSION.newerThan(Minecraft.Version.v1_19_R2)) {
+                    if (DataWatcherItemMethodResolver == null) {
+                        DataWatcherItemMethodResolver = new MethodResolver(
+                            MapManagerPlugin.nmsClassResolver.resolve(
+                                "network.syncher.DataWatcher$Item",
+                                "network.syncer.DataWatcher$Item",
+                                "WatchableObject",
+                                "DataWatcher$WatchableObject",
+                                "DataWatcher$Item"/*1.9*/
+                            )
+                        );
+                    }
+
+                    list.add(DataWatcherItemMethodResolver.resolve(
+                        "e"
+                    ).invoke(dataWatcherItem));
+                } else {
+                    list.add(dataWatcherItem);
+                }
             }
 
             Object meta;
