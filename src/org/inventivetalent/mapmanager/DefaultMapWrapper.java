@@ -455,32 +455,28 @@ class DefaultMapWrapper implements MapWrapper {
                 Constructor<?> noArgConstructor = PacketPlayOutEntityMetadata.getConstructor();
                 meta = noArgConstructor.newInstance();
             } catch (ReflectiveOperationException e) {
-                Object dummyDataWatcher = DataWatcher.getConstructor(Entity).newInstance((Object) null);
-                String idField;
-                String itemsField;
-
                 if (MinecraftVersion.VERSION.newerThan(Minecraft.Version.v1_19_R2)) {
-                    idField = "b";
-                    itemsField = "c";
+                    meta = PacketPlayOutEntityMetadata.getConstructor(
+                        int.class,
+                        List.class
+                    ).newInstance(entityId, list);
                 } else {
-                    idField = "a";
-                    itemsField = "b";
+                    Object dummyDataWatcher = DataWatcher.getConstructor(Entity).newInstance((Object) null);
+                    meta = PacketPlayOutEntityMetadata.getConstructor(
+                        int.class,
+                        DataWatcher,
+                        boolean.class
+                    ).newInstance(entityId, dummyDataWatcher, true);
+
+                    //Set the Entity ID of the frame
+                    PacketEntityMetadataFieldResolver.resolveAccessor(
+                        "a"
+                    ).set(meta, entityId);
+
+                    PacketEntityMetadataFieldResolver.resolveAccessor(
+                        "b"
+                    ).set(meta, list);
                 }
-
-                meta = PacketPlayOutEntityMetadata.getConstructor(
-                    int.class,
-                    DataWatcher,
-                    boolean.class
-                ).newInstance(entityId, dummyDataWatcher, true);
-
-                //Set the Entity ID of the frame
-                PacketEntityMetadataFieldResolver.resolveAccessor(
-                    idField
-                ).set(meta, entityId);
-
-                PacketEntityMetadataFieldResolver.resolveAccessor(
-                    itemsField
-                ).set(meta, list);
             }
 
 
