@@ -162,17 +162,18 @@ class PacketListener {
             x = Vec3DFieldResolver.resolveAccessor("b").get(vec3D);
             y = Vec3DFieldResolver.resolveAccessor("c").get(vec3D);
             z = Vec3DFieldResolver.resolveAccessor("d").get(vec3D);
-        }
-        try {
-            x = Vec3DFieldResolver.resolveAccessor("x"/*1.9*/, "a").get(vec3D);
-            y = Vec3DFieldResolver.resolveAccessor("y"/*1.9*/, "b").get(vec3D);
-            z = Vec3DFieldResolver.resolveAccessor("z"/*1.9*/, "c").get(vec3D);
-        } catch (Exception e) {
-            x = 0;
-            y = 0;
-            z = 0;
+        } else {
+            try {
+                x = Vec3DFieldResolver.resolveAccessor("x"/*1.9*/, "a").get(vec3D);
+                y = Vec3DFieldResolver.resolveAccessor("y"/*1.9*/, "b").get(vec3D);
+                z = Vec3DFieldResolver.resolveAccessor("z"/*1.9*/, "c").get(vec3D);
+            } catch (Exception e) {
+                x = 0;
+                y = 0;
+                z = 0;
 
-            e.printStackTrace();
+                e.printStackTrace();
+            }
         }
         return new Vector(x, y, z);
     }
