@@ -12,6 +12,7 @@ import org.inventivetalent.packetlistener.handler.PacketOptions;
 import org.inventivetalent.packetlistener.handler.ReceivedPacket;
 import org.inventivetalent.packetlistener.handler.SentPacket;
 import org.inventivetalent.reflection.minecraft.Minecraft;
+import org.inventivetalent.reflection.minecraft.Minecraft.Version;
 import org.inventivetalent.reflection.minecraft.MinecraftVersion;
 import org.inventivetalent.reflection.resolver.FieldResolver;
 import org.inventivetalent.reflection.resolver.MethodResolver;
@@ -148,21 +149,32 @@ class PacketListener {
 
     protected Vector vec3DtoVector(Object vec3D) {
         if (vec3D == null) {return null;}
-        if (MinecraftVersion.VERSION.newerThan(Minecraft.Version.v1_17_R1)) {
-            double b = (double) Vec3DFieldResolver.resolveAccessor("b").get(vec3D);
-            double c = (double) Vec3DFieldResolver.resolveAccessor("c").get(vec3D);
-            double d = (double) Vec3DFieldResolver.resolveAccessor("c").get(vec3D);
-            return new Vector(b, c, d);
+
+        double x;
+        double y;
+        double z;
+
+        if (MinecraftVersion.VERSION.newerThan(Minecraft.Version.v1_19_R1)) {
+            x = (double) Vec3DFieldResolver.resolveAccessor("c").get(vec3D);
+            y = (double) Vec3DFieldResolver.resolveAccessor("d").get(vec3D);
+            z = (double) Vec3DFieldResolver.resolveAccessor("e").get(vec3D);
+        } else if (MinecraftVersion.VERSION.newerThan(Minecraft.Version.v1_17_R1)) {
+            x = (double) Vec3DFieldResolver.resolveAccessor("b").get(vec3D);
+            y = (double) Vec3DFieldResolver.resolveAccessor("c").get(vec3D);
+            z = (double) Vec3DFieldResolver.resolveAccessor("d").get(vec3D);
         }
         try {
-            double a = (double) Vec3DFieldResolver.resolveAccessor("x"/*1.9*/, "a").get(vec3D);
-            double b = (double) Vec3DFieldResolver.resolveAccessor("y"/*1.9*/, "b").get(vec3D);
-            double c = (double) Vec3DFieldResolver.resolveAccessor("z"/*1.9*/, "c").get(vec3D);
-            return new Vector(a, b, c);
+            x = (double) Vec3DFieldResolver.resolveAccessor("x"/*1.9*/, "a").get(vec3D);
+            y = (double) Vec3DFieldResolver.resolveAccessor("y"/*1.9*/, "b").get(vec3D);
+            z = (double) Vec3DFieldResolver.resolveAccessor("z"/*1.9*/, "c").get(vec3D);
         } catch (Exception e) {
+            x = 0;
+            y = 0;
+            z = 0;
+
             e.printStackTrace();
         }
-        return new Vector(0, 0, 0);
+        return new Vector(x, y, z);
     }
 
     protected void disable() {
