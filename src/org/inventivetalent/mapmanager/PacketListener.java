@@ -155,18 +155,18 @@ class PacketListener {
         double z;
 
         if (MinecraftVersion.VERSION.newerThan(Minecraft.Version.v1_19_R1)) {
-            x = (double) Vec3DFieldResolver.resolveAccessor("c").get(vec3D);
-            y = (double) Vec3DFieldResolver.resolveAccessor("d").get(vec3D);
-            z = (double) Vec3DFieldResolver.resolveAccessor("e").get(vec3D);
+            x = Vec3DFieldResolver.resolveAccessor("c").get(vec3D);
+            y = Vec3DFieldResolver.resolveAccessor("d").get(vec3D);
+            z = Vec3DFieldResolver.resolveAccessor("e").get(vec3D);
         } else if (MinecraftVersion.VERSION.newerThan(Minecraft.Version.v1_17_R1)) {
-            x = (double) Vec3DFieldResolver.resolveAccessor("b").get(vec3D);
-            y = (double) Vec3DFieldResolver.resolveAccessor("c").get(vec3D);
-            z = (double) Vec3DFieldResolver.resolveAccessor("d").get(vec3D);
+            x = Vec3DFieldResolver.resolveAccessor("b").get(vec3D);
+            y = Vec3DFieldResolver.resolveAccessor("c").get(vec3D);
+            z = Vec3DFieldResolver.resolveAccessor("d").get(vec3D);
         }
         try {
-            x = (double) Vec3DFieldResolver.resolveAccessor("x"/*1.9*/, "a").get(vec3D);
-            y = (double) Vec3DFieldResolver.resolveAccessor("y"/*1.9*/, "b").get(vec3D);
-            z = (double) Vec3DFieldResolver.resolveAccessor("z"/*1.9*/, "c").get(vec3D);
+            x = Vec3DFieldResolver.resolveAccessor("x"/*1.9*/, "a").get(vec3D);
+            y = Vec3DFieldResolver.resolveAccessor("y"/*1.9*/, "b").get(vec3D);
+            z = Vec3DFieldResolver.resolveAccessor("z"/*1.9*/, "c").get(vec3D);
         } catch (Exception e) {
             x = 0;
             y = 0;
